@@ -124,7 +124,7 @@ function analyzeSalesData(data, options) {
   // Сортировка продавцов по прибыли
   sellerStats.sort((a, b) => b.profit - a.profit);
 
-  // Назначение премий и топ-товаров
+  // Назначение премий на основе ранжирования
   for (let i = 0; i < sellerStats.length; i++) {
     const seller = sellerStats[i];
     const total = sellerStats.length;
@@ -137,11 +137,12 @@ function analyzeSalesData(data, options) {
       quantity: quantity,
     }));
 
+    // Сортировка: сначала по количеству (убывание), потом по SKU (убывание)
     topProducts.sort((a, b) => {
       if (a.quantity !== b.quantity) {
         return b.quantity - a.quantity;
       }
-      return a.sku.localeCompare(b.sku);
+      return b.sku.localeCompare(a.sku);
     });
 
     seller.top_products = topProducts.slice(0, 10);
