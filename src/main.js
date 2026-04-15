@@ -5,21 +5,11 @@
  * @returns {number}
  */
 function calculateSimpleRevenue(purchase, _product) {
-  // @TODO: Расчет выручки от операции
   // purchase — это одна из записей в поле items из чека
-  // _product — продукт из коллекции data.products (пока не используется)
   const { discount, sale_price, quantity } = purchase;
 
-  // Переводим скидку из процентов в десятичное число
-  const discountDecimal = discount / 100;
-
-  // Полная стоимость без скидки
-  const fullPrice = sale_price * quantity;
-
-  // Выручка с учётом скидки
-  const revenue = fullPrice * (1 - discountDecimal);
-
-  return revenue;
+  // Выручка с учётом скидки (скидка в процентах)
+  return sale_price * quantity * (1 - discount / 100);
 }
 
 /**
@@ -30,8 +20,6 @@ function calculateSimpleRevenue(purchase, _product) {
  * @returns {number}
  */
 function calculateBonusByProfit(index, total, seller) {
-  // @TODO: Расчет бонуса от позиции в рейтинге
-
   const { profit } = seller;
 
   let percent = 0;
@@ -60,9 +48,7 @@ function calculateBonusByProfit(index, total, seller) {
  * @returns {{revenue, top_products, bonus, name, sales_count, profit, seller_id}[]}
  */
 function analyzeSalesData(data, options) {
-  // @TODO: Проверка входных данных
-
-  // Проверяем, что данные корректны
+  // ==================== ШАГ 1: ПРОВЕРКА ВХОДНЫХ ДАННЫХ ====================
   if (
     !data ||
     !Array.isArray(data.sellers) ||
@@ -77,22 +63,17 @@ function analyzeSalesData(data, options) {
 
   console.log('Шаг 1: Проверка входных данных пройдена');
 
-  // @TODO: Проверка наличия опций
-
-  // Проверяем, что options существует
+  // ==================== ШАГ 2: ПРОВЕРКА НАЛИЧИЯ ОПЦИЙ ====================
   if (!options || typeof options !== 'object') {
     throw new Error('Отсутствуют настройки options');
   }
 
-  // Извлекаем функции из options
   const { calculateRevenue, calculateBonus } = options;
 
-  // Проверяем, что функции переданы
   if (!calculateRevenue || !calculateBonus) {
     throw new Error('Отсутствуют необходимые функции в options');
   }
 
-  // Проверяем, что переданные значения — это действительно функции
   if (typeof calculateRevenue !== 'function') {
     throw new Error('calculateRevenue должна быть функцией');
   }
@@ -102,29 +83,24 @@ function analyzeSalesData(data, options) {
 
   console.log('Шаг 2: Проверка опций пройдена');
 
-  // @TODO: Подготовка промежуточных данных для сбора статистики
-
-  // Создаём массив статистики для каждого продавца
+  // ==================== ШАГ 3: ПОДГОТОВКА ПРОМЕЖУТОЧНЫХ ДАННЫХ ====================
   const sellerStats = data.sellers.map((seller) => ({
     id: seller.id,
     name: `${seller.first_name} ${seller.last_name}`,
-    revenue: 0, // выручка (доход от продаж)
-    profit: 0, // прибыль (выручка - себестоимость)
-    sales_count: 0, // количество чеков (продаж)
-    products_sold: {}, // объект: { "SKU_001": 5, "SKU_002": 3 }
+    revenue: 0,
+    profit: 0,
+    sales_count: 0,
+    products_sold: {},
   }));
 
   console.log('Шаг 3: Промежуточные данные подготовлены', sellerStats);
 
-  // @TODO: Индексация продавцов и товаров для быстрого доступа
-
-  // Создаём индекс продавцов: id -> объект статистики продавца
+  // ==================== ШАГ 4: ИНДЕКСАЦИЯ ПРОДАВЦОВ И ТОВАРОВ ====================
   const sellerIndex = {};
   for (const seller of sellerStats) {
     sellerIndex[seller.id] = seller;
   }
 
-  // Создаём индекс товаров: sku -> объект товара из data.products
   const productIndex = {};
   for (const product of data.products) {
     productIndex[product.sku] = product;
@@ -132,37 +108,21 @@ function analyzeSalesData(data, options) {
 
   console.log('Шаг 4: Индексация продавцов и товаров пройдена');
 
-  // @TODO: Расчет выручки и прибыли для каждого продавца
-
-  // Проходим по всем чекам
+  // ==================== ШАГ 5: РАСЧЁТ ВЫРУЧКИ И ПРИБЫЛИ ====================
   for (const record of data.purchase_records) {
-    // Ищем продавца
     const seller = sellerIndex[record.seller_id];
 
-    // Увеличиваем количество продаж (чеков)
     seller.sales_count += 1;
 
-    // Проходим по всем товарам в чеке
     for (const item of record.items) {
-      // Находим товар в каталоге
       const product = productIndex[item.sku];
-
-      // Себестоимость = закупочная цена × количество
       const cost = product.purchase_price * item.quantity;
-
-      // Выручка от товара с учётом скидки (через функцию calculateRevenue)
       const revenue = calculateRevenue(item);
-
-      // Прибыль от товара
       const profit = revenue - cost;
 
-      // Добавляем к выручке продавца
-      seller.revenue += revenue; // ← ЭТА СТРОКА БЫЛА ПРОПУЩЕНА
-
-      // Добавляем к прибыли продавца
+      seller.revenue += revenue;
       seller.profit += profit;
 
-      // Увеличиваем счётчик проданных товаров
       if (!seller.products_sold[item.sku]) {
         seller.products_sold[item.sku] = 0;
       }
@@ -172,9 +132,7 @@ function analyzeSalesData(data, options) {
 
   console.log('Шаг 5: Расчёт выручки и прибыли завершён');
 
-  // @TODO: Сортировка продавцов по прибыли
-
-  // Сортируем продавцов по убыванию прибыли (от большего к меньшему)
+  // ==================== ШАГ 6: СОРТИРОВКА ПРОДАВЦОВ ПО ПРИБЫЛИ ====================
   sellerStats.sort((a, b) => b.profit - a.profit);
 
   console.log('Шаг 6: Сортировка продавцов по прибыли завершена');
@@ -182,23 +140,23 @@ function analyzeSalesData(data, options) {
     'Отсортированные продавцы:',
     sellerStats.map((s) => ({ name: s.name, profit: s.profit }))
   );
-  // @TODO: Назначение премий на основе ранжирования
 
+  // ==================== ШАГ 7: НАЗНАЧЕНИЕ ПРЕМИЙ НА ОСНОВЕ РАНЖИРОВАНИЯ ====================
   for (let i = 0; i < sellerStats.length; i++) {
     const seller = sellerStats[i];
     const total = sellerStats.length;
 
-    // 1. Рассчитываем бонус
+    // Рассчитываем бонус
     seller.bonus = calculateBonus(i, total, seller);
 
-    // 2. Формируем топ-10 товаров
+    // Формируем топ-10 товаров
     const productsArray = Object.entries(seller.products_sold);
     const topProducts = productsArray.map(([sku, quantity]) => ({
       sku: sku,
       quantity: quantity,
     }));
 
-    // Сортировка: по количеству (убывание), затем по SKU (возрастание)
+    // Сортировка: сначала по количеству (убывание), потом по SKU (возрастание)
     topProducts.sort((a, b) => {
       if (a.quantity !== b.quantity) {
         return b.quantity - a.quantity;
@@ -209,21 +167,24 @@ function analyzeSalesData(data, options) {
     seller.top_products = topProducts.slice(0, 10);
   }
 
-  // @TODO: Подготовка итоговой коллекции с нужными полями
+  console.log('Шаг 7: Премии и топ-товары назначены');
+  console.log(
+    'Продавцы с бонусами:',
+    sellerStats.map((s) => ({ name: s.name, bonus: s.bonus }))
+  );
 
-  // Преобразуем sellerStats в итоговый отчёт
+  // ==================== ШАГ 8: ПОДГОТОВКА ИТОГОВОЙ КОЛЛЕКЦИИ ====================
   const report = sellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
-    revenue: +seller.revenue.toFixed(2), // 2 знака после запятой, затем преобразуем в число
-    profit: +seller.profit.toFixed(2), // 2 знака после запятой
+    revenue: +seller.revenue.toFixed(2),
+    profit: +seller.profit.toFixed(2),
     sales_count: seller.sales_count,
     top_products: seller.top_products,
-    bonus: +seller.bonus.toFixed(2), // 2 знака после запятой
+    bonus: +seller.bonus.toFixed(2),
   }));
 
   console.log('Шаг 8: Итоговая коллекция подготовлена');
 
-  // Результат
   return report;
 }
