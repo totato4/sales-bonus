@@ -234,6 +234,6 @@ function analyzeSalesData(data, options) {
 
   console.log('Шаг 8: Итоговая коллекция подготовлена');
 
-  // Возвращаем отчёт
+  // Результат
   return report;
 }
