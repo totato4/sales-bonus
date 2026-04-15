@@ -48,7 +48,7 @@ function calculateBonusByProfit(index, total, seller) {
  * @returns {{revenue, top_products, bonus, name, sales_count, profit, seller_id}[]}
  */
 function analyzeSalesData(data, options) {
-  // ==================== ШАГ 1: ПРОВЕРКА ВХОДНЫХ ДАННЫХ ====================
+  // Проверка входных данных
   if (
     !data ||
     !Array.isArray(data.sellers) ||
@@ -61,9 +61,7 @@ function analyzeSalesData(data, options) {
     throw new Error('Некорректные входные данные');
   }
 
-  console.log('Шаг 1: Проверка входных данных пройдена');
-
-  // ==================== ШАГ 2: ПРОВЕРКА НАЛИЧИЯ ОПЦИЙ ====================
+  // Проверка наличия опций
   if (!options || typeof options !== 'object') {
     throw new Error('Отсутствуют настройки options');
   }
@@ -81,9 +79,7 @@ function analyzeSalesData(data, options) {
     throw new Error('calculateBonus должна быть функцией');
   }
 
-  console.log('Шаг 2: Проверка опций пройдена');
-
-  // ==================== ШАГ 3: ПОДГОТОВКА ПРОМЕЖУТОЧНЫХ ДАННЫХ ====================
+  // Подготовка промежуточных данных
   const sellerStats = data.sellers.map((seller) => ({
     id: seller.id,
     name: `${seller.first_name} ${seller.last_name}`,
@@ -93,9 +89,7 @@ function analyzeSalesData(data, options) {
     products_sold: {},
   }));
 
-  console.log('Шаг 3: Промежуточные данные подготовлены', sellerStats);
-
-  // ==================== ШАГ 4: ИНДЕКСАЦИЯ ПРОДАВЦОВ И ТОВАРОВ ====================
+  // Индексация продавцов и товаров
   const sellerIndex = {};
   for (const seller of sellerStats) {
     sellerIndex[seller.id] = seller;
@@ -106,12 +100,9 @@ function analyzeSalesData(data, options) {
     productIndex[product.sku] = product;
   }
 
-  console.log('Шаг 4: Индексация продавцов и товаров пройдена');
-
-  // ==================== ШАГ 5: РАСЧЁТ ВЫРУЧКИ И ПРИБЫЛИ ====================
+  // Расчёт выручки и прибыли
   for (const record of data.purchase_records) {
     const seller = sellerIndex[record.seller_id];
-
     seller.sales_count += 1;
 
     for (const item of record.items) {
@@ -130,33 +121,22 @@ function analyzeSalesData(data, options) {
     }
   }
 
-  console.log('Шаг 5: Расчёт выручки и прибыли завершён');
-
-  // ==================== ШАГ 6: СОРТИРОВКА ПРОДАВЦОВ ПО ПРИБЫЛИ ====================
+  // Сортировка продавцов по прибыли
   sellerStats.sort((a, b) => b.profit - a.profit);
 
-  console.log('Шаг 6: Сортировка продавцов по прибыли завершена');
-  console.log(
-    'Отсортированные продавцы:',
-    sellerStats.map((s) => ({ name: s.name, profit: s.profit }))
-  );
-
-  // ==================== ШАГ 7: НАЗНАЧЕНИЕ ПРЕМИЙ НА ОСНОВЕ РАНЖИРОВАНИЯ ====================
+  // Назначение премий и топ-товаров
   for (let i = 0; i < sellerStats.length; i++) {
     const seller = sellerStats[i];
     const total = sellerStats.length;
 
-    // Рассчитываем бонус
     seller.bonus = calculateBonus(i, total, seller);
 
-    // Формируем топ-10 товаров
     const productsArray = Object.entries(seller.products_sold);
     const topProducts = productsArray.map(([sku, quantity]) => ({
       sku: sku,
       quantity: quantity,
     }));
 
-    // Сортировка: сначала по количеству (убывание), потом по SKU (возрастание)
     topProducts.sort((a, b) => {
       if (a.quantity !== b.quantity) {
         return b.quantity - a.quantity;
@@ -167,13 +147,7 @@ function analyzeSalesData(data, options) {
     seller.top_products = topProducts.slice(0, 10);
   }
 
-  console.log('Шаг 7: Премии и топ-товары назначены');
-  console.log(
-    'Продавцы с бонусами:',
-    sellerStats.map((s) => ({ name: s.name, bonus: s.bonus }))
-  );
-
-  // ==================== ШАГ 8: ПОДГОТОВКА ИТОГОВОЙ КОЛЛЕКЦИИ ====================
+  // Подготовка итоговой коллекции
   const report = sellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
@@ -183,8 +157,6 @@ function analyzeSalesData(data, options) {
     top_products: seller.top_products,
     bonus: +seller.bonus.toFixed(2),
   }));
-
-  console.log('Шаг 8: Итоговая коллекция подготовлена');
 
   return report;
 }
