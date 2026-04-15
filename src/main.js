@@ -207,7 +207,12 @@ function analyzeSalesData(data, options) {
     }));
 
     //    Сортируем по убыванию количества (от большего к меньшему)
-    topProducts.sort((a, b) => b.quantity - a.quantity);
+    topProducts.sort((a, b) => {
+      if (b.quantity !== a.quantity) {
+        return b.quantity - a.quantity; // сначала по количеству (убывание)
+      }
+      return a.sku.localeCompare(b.sku); // потом по SKU (возрастание)
+    });
 
     //    Берём первые 10 (или меньше, если товаров меньше 10)
     seller.top_products = topProducts.slice(0, 10);
