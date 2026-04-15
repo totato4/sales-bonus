@@ -184,45 +184,30 @@ function analyzeSalesData(data, options) {
   );
   // @TODO: Назначение премий на основе ранжирования
 
-  // Проходим по отсортированным продавцам
   for (let i = 0; i < sellerStats.length; i++) {
     const seller = sellerStats[i];
     const total = sellerStats.length;
 
-    // 1. Рассчитываем бонус для продавца
-    //    i — это индекс (место в рейтинге, где 0 = первое место)
-    //    total — общее количество продавцов
-    //    seller — объект продавца (нужен для получения profit)
+    // 1. Рассчитываем бонус
     seller.bonus = calculateBonus(i, total, seller);
 
     // 2. Формируем топ-10 товаров
-    //    Преобразуем объект products_sold в массив
     const productsArray = Object.entries(seller.products_sold);
-    //    productsArray имеет вид: [["SKU_001", 5], ["SKU_002", 3], ...]
-
-    //    Преобразуем в нужный формат: [{ sku: "SKU_001", quantity: 5 }, ...]
     const topProducts = productsArray.map(([sku, quantity]) => ({
       sku: sku,
       quantity: quantity,
     }));
 
-    //    Сортируем по убыванию количества (от большего к меньшему)
+    // Сортировка: по количеству (убывание), затем по SKU (возрастание)
     topProducts.sort((a, b) => {
-      if (b.quantity !== a.quantity) {
-        return b.quantity - a.quantity; // сначала по количеству (убывание)
+      if (a.quantity !== b.quantity) {
+        return b.quantity - a.quantity;
       }
-      return a.sku.localeCompare(b.sku); // потом по SKU (возрастание)
+      return a.sku.localeCompare(b.sku);
     });
 
-    //    Берём первые 10 (или меньше, если товаров меньше 10)
     seller.top_products = topProducts.slice(0, 10);
   }
-
-  console.log('Шаг 7: Премии и топ-товары назначены');
-  console.log(
-    'Продавцы с бонусами:',
-    sellerStats.map((s) => ({ name: s.name, bonus: s.bonus }))
-  );
 
   // @TODO: Подготовка итоговой коллекции с нужными полями
 
