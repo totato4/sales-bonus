@@ -111,8 +111,9 @@ function analyzeSalesData(data, options) {
       const revenue = calculateRevenue(item);
       const profit = revenue - cost;
 
-      seller.revenue += revenue;
-      seller.profit += profit;
+      // Округляем revenue до 2 знаков ПРИ ДОБАВЛЕНИИ к сумме
+      seller.revenue += Math.round(revenue * 100) / 100;
+      seller.profit += profit; // profit округлится позже, в конце
 
       if (!seller.products_sold[item.sku]) {
         seller.products_sold[item.sku] = 0;
@@ -152,11 +153,11 @@ function analyzeSalesData(data, options) {
   const report = sellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
-    revenue: Math.round(seller.revenue * 100) / 100,
-    profit: Math.round(seller.profit * 100) / 100,
+    revenue: Number(seller.revenue.toFixed(2)), // округляем в конце
+    profit: Number(seller.profit.toFixed(2)), // округляем в конце
     sales_count: seller.sales_count,
     top_products: seller.top_products,
-    bonus: Math.round(seller.bonus * 100) / 100,
+    bonus: Number(seller.bonus.toFixed(2)), // округляем в конце
   }));
 
   return report;
