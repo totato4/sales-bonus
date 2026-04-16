@@ -143,7 +143,7 @@ function analyzeSalesData(data, options) {
       if (a.quantity !== b.quantity) {
         return b.quantity - a.quantity;
       }
-      return b.sku.localeCompare(a.sku);
+      return a.sku.localeCompare(b.sku);
     });
 
     seller.top_products = topProducts.slice(0, 10);
