@@ -135,7 +135,7 @@ function analyzeSalesData(data, options) {
   console.log('после того как пробежался по чекам изменение в sellerIndex:', sellerIndex);
 
   // ОТСОРТИРОВАН ПО ПРОФИТУ (profit) у статистики продавцов
-  const sortedSellerStats = sellerStats.toSorted((a, b) => b.profit - a.profit);
+  const sortedSellerStats = sellerStats.sort((a, b) => b.profit - a.profit);
   console.log('Это ОТСОРТИРОВАННЫЙ SELLERSTATS', sortedSellerStats);
 
   // Считаем бонус для продавцов
