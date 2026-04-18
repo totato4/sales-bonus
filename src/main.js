@@ -7,10 +7,10 @@
 function calculateSimpleRevenue(purchase, _product) {
   const { discount, sale_price, quantity } = purchase;
 
-  // Шаг 1: Рассчитываем коэффициент скидки
+  // коэффициент скидки
   const discountFactor = 1 - discount / 100;
 
-  // Шаг 2: Рассчитываем и возвращаем выручку
+  // подсчет выручки
   return sale_price * quantity * discountFactor;
 }
 /**
