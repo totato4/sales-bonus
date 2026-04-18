@@ -41,7 +41,8 @@ function calculateBonusByProfit(index, total, seller) {
  * @returns {{revenue, top_products, bonus, name, sales_count, profit, seller_id}[]}
  */
 function analyzeSalesData(data, options) {
-  // ===== ПРОВЕРКА ВХОДНЫХ ДАННЫХ =====
+  // @TODO: Проверка входных данных
+  // @TODO: Проверка наличия опций
   if (
     !data ||
     !Array.isArray(data.sellers) ||
@@ -69,6 +70,8 @@ function analyzeSalesData(data, options) {
     throw new Error('calculateRevenue и calculateBonus должны быть функциями');
   }
 
+  // @TODO: Подготовка промежуточных данных для сбора статистики
+  // Здесь я типа объекты продавцов создаю, где будет вся статистика высчитываться и тут собираться
   const sellerStats = data.sellers.map((seller) => ({
     id: seller.id,
     name: `${seller.first_name} ${seller.last_name}`,
@@ -80,13 +83,15 @@ function analyzeSalesData(data, options) {
 
   console.log('здесь собрана статистика по продавцам!', sellerStats);
 
+  // @TODO: Индексация продавцов и товаров для быстрого доступа
+  // Здесь вообщем можно через скобы [] быстро ОБРАЩАТЬСЯ к нужному продавцу, а не ИСКАТЬ через find метод и тд.
   const sellerIndex = sellerStats.reduce((result, seller) => {
     result[seller.id] = seller;
     return result;
   }, {});
 
   console.log('это коллекция продавцов!!!!', sellerIndex);
-
+  // ТОЖЕ САМОЕ, только для товаров
   const productIndex = data.products.reduce((result, product) => {
     result[product.sku] = product;
     return result;
@@ -99,6 +104,7 @@ function analyzeSalesData(data, options) {
 
   console.log('Проверка: найдем товар SKU_001', productIndex['SKU_001']);
 
+  // @TODO: Расчет выручки и прибыли для каждого продавца
   //  перебор чеков и покупок в них
   data.purchase_records.forEach((record) => {
     // нашел продавца который учавстовал в продаже в данном (одном) чеке
@@ -112,8 +118,8 @@ function analyzeSalesData(data, options) {
       const product = productIndex[item.sku];
 
       // Выручка по формуле (используем переданную функцию)
-      // const revenue = calculateRevenue(item);
-      const revenue = Math.round(calculateRevenue(item) * 100) / 100;
+      const revenue = calculateRevenue(item);
+      // const revenue = Math.round(calculateRevenue(item) * 100) / 100;
 
       // Себестоимость = цена закупки × количество товара из чека
       const cost = product.purchase_price * item.quantity;
@@ -135,10 +141,12 @@ function analyzeSalesData(data, options) {
 
   console.log('после того как пробежался по чекам изменение в sellerIndex:', sellerIndex);
 
+  // @TODO: Сортировка продавцов по прибыли
   // ОТСОРТИРОВАН ПО ПРОФИТУ (profit) у статистики продавцов
   const sortedSellerStats = sellerStats.sort((a, b) => b.profit - a.profit);
   console.log('Это ОТСОРТИРОВАННЫЙ SELLERSTATS', sortedSellerStats);
 
+  // @TODO: Назначение премий на основе ранжирования
   // Считаем бонус для продавцов
 
   sortedSellerStats.forEach((seller, index) => {
@@ -154,7 +162,8 @@ function analyzeSalesData(data, options) {
 
   console.log('после топ 10 продуктов, смотри top_products', sortedSellerStats);
 
-  // ===== ФОРМИРУЕМ ИТОГОВЫЙ ОТЧЕТ =====
+  // @TODO: Подготовка итоговой коллекции с нужными полями
+  // ===== ЭТО ИТОГОВЫЙ ОТЧЕТ =====
   const report = sortedSellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
@@ -167,18 +176,4 @@ function analyzeSalesData(data, options) {
 
   console.log('Итоговый отчет:', report);
   return report;
-  // Здесь посчитаем промежуточные данные и отсортируем продавцов
-
-  // Вызовем функцию расчёта бонуса для каждого продавца в отсортированном массиве
-
-  // Сформируем и вернём отчёт
-
-  // @TODO: Проверка входных данных
-  // @TODO: Проверка наличия опций
-  // @TODO: Подготовка промежуточных данных для сбора статистики
-  // @TODO: Индексация продавцов и товаров для быстрого доступа
-  // @TODO: Расчет выручки и прибыли для каждого продавца
-  // @TODO: Сортировка продавцов по прибыли
-  // @TODO: Назначение премий на основе ранжирования
-  // @TODO: Подготовка итоговой коллекции с нужными полями
 }
