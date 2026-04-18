@@ -112,7 +112,8 @@ function analyzeSalesData(data, options) {
       const product = productIndex[item.sku];
 
       // Выручка по формуле (используем переданную функцию)
-      const revenue = calculateRevenue(item);
+      // const revenue = calculateRevenue(item);
+      const revenue = Math.round(calculateRevenue(item) * 100) / 100;
 
       // Себестоимость = цена закупки × количество товара из чека
       const cost = product.purchase_price * item.quantity;
