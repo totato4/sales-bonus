@@ -11,7 +11,8 @@ function calculateSimpleRevenue(purchase, _product) {
   const discountFactor = 1 - discount / 100;
 
   // подсчет выручки
-  return sale_price * quantity * discountFactor;
+  const revenue = sale_price * quantity * discountFactor;
+  return revenue;
 }
 /**
  * Функция для расчета бонусов
@@ -24,13 +25,13 @@ function calculateBonusByProfit(index, total, seller) {
   const { profit } = seller;
 
   if (index === 0) {
-    return (profit * 15) / 100;
+    return profit * 0.15;
   } else if (index === 1 || index === 2) {
-    return (profit * 10) / 100;
+    return profit * 0.1;
   } else if (index === total - 1) {
     return 0;
   } else {
-    return (profit * 5) / 100;
+    return profit * 0.05;
   }
 }
 
@@ -119,7 +120,6 @@ function analyzeSalesData(data, options) {
 
       // Выручка по формуле (используем переданную функцию)
       const revenue = calculateRevenue(item);
-      // const revenue = Math.round(calculateRevenue(item) * 100) / 100;
 
       // Себестоимость = цена закупки × количество товара из чека
       const cost = product.purchase_price * item.quantity;
