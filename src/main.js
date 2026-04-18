@@ -152,6 +152,20 @@ function analyzeSalesData(data, options) {
   });
 
   console.log('после топ 10 продуктов, смотри top_products', sortedSellerStats);
+
+  // ===== ФОРМИРУЕМ ИТОГОВЫЙ ОТЧЕТ =====
+  const report = sortedSellerStats.map((seller) => ({
+    seller_id: seller.id,
+    name: seller.name,
+    revenue: Number(seller.revenue.toFixed(2)),
+    profit: Number(seller.profit.toFixed(2)),
+    sales_count: seller.sales_count,
+    top_products: seller.top_products,
+    bonus: Number(seller.bonus.toFixed(2)),
+  }));
+
+  console.log('Итоговый отчет:', report);
+  return report;
   // Здесь посчитаем промежуточные данные и отсортируем продавцов
 
   // Вызовем функцию расчёта бонуса для каждого продавца в отсортированном массиве
