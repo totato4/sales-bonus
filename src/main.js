@@ -8,7 +8,8 @@ function calculateSimpleRevenue(purchase, _product) {
   const { discount, sale_price, quantity } = purchase;
 
   // коэффициент скидки
-  const discountFactor = 1 - discount / 100;
+  const percentDiscount = discount / 100;
+  const discountFactor = 1 - percentDiscount;
 
   // подсчет выручки
   const revenue = sale_price * quantity * discountFactor;
