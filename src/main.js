@@ -8,8 +8,7 @@ function calculateSimpleRevenue(purchase, _product) {
   const { discount, sale_price, quantity } = purchase;
 
   // коэффициент скидки
-  const percentDiscount = discount / 100;
-  const discountFactor = 1 - percentDiscount;
+  const discountFactor = 1 - discount / 100;
 
   // подсчет выручки
   const revenue = sale_price * quantity * discountFactor;
@@ -26,13 +25,13 @@ function calculateBonusByProfit(index, total, seller) {
   const { profit } = seller;
 
   if (index === 0) {
-    return profit * 0.15;
+    return (profit * 15) / 100;
   } else if (index === 1 || index === 2) {
-    return profit * 0.1;
+    return (profit * 10) / 100;
   } else if (index === total - 1) {
     return 0;
   } else {
-    return profit * 0.05;
+    return (profit * 5) / 100;
   }
 }
 
