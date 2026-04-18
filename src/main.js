@@ -112,6 +112,7 @@ function analyzeSalesData(data, options) {
     const seller = sellerIndex[record.seller_id];
     // увеличивает количество продаж на один (так как один чек = одна продажа)
     seller.sales_count = seller.sales_count + 1;
+    seller.revenue += record.total_amount;
 
     // Перебираем все товары в чеке
     record.items.forEach((item) => {
@@ -128,7 +129,6 @@ function analyzeSalesData(data, options) {
       const profit = revenue - cost;
 
       // Накопливаем выручку и прибыль у продавца
-      seller.revenue += revenue;
       seller.profit += profit;
 
       // Собираем статистику по товарам для топ-10
