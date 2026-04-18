@@ -167,11 +167,11 @@ function analyzeSalesData(data, options) {
   const report = sortedSellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
-    revenue: Number(seller.revenue.toFixed(2)),
-    profit: Number(seller.profit.toFixed(2)),
+    revenue: +seller.revenue.toFixed(2),
+    profit: +seller.profit.toFixed(2),
     sales_count: seller.sales_count,
     top_products: seller.top_products,
-    bonus: Number(seller.bonus.toFixed(2)),
+    bonus: +seller.bonus.toFixed(2),
   }));
 
   console.log('Итоговый отчет:', report);
